@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("path")
 parser.add_argument("--prefix")
 parser.add_argument("--suffix")
+parser.add_argument("--numbering")
 parser.add_argument("--yes", action="store_true")
 
 args = parser.parse_args()
@@ -33,6 +34,9 @@ else :
                 if new is not None :
                     changes.append((old , new))
 
+    if not found:
+        print("Files do not exist.") 
+        
     from renamer import suffix_rename
     if args.suffix :
         suffix = args.suffix
@@ -44,9 +48,21 @@ else :
                 new = suffix_rename(file,suffix)
                 if new is not None :
                     changes.append((old , new))
-            
-    if not found:
-        print("Files do not exist.")        
+             
+    if args.numbering :
+        changes = []
+        sorted(files)
+        for number, file in enumerate(files, start=1):
+            if file.is_file():
+                old = file
+                padded_num = str(number).zfill(3)
+                new = padded_num + file.suffix
+                new_path = file.parent / new
+                if new_path.exists():
+                    continue
+                changes.append((old,new_path))
+
+           
             
     from preview import preview
     preview(changes)
