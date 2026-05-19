@@ -29,7 +29,7 @@ def upper(file):
     new_name = file.name.upper()
     new_path = file.parent / new_name
 
-    if new_path.exists :
+    if new_path.exists() :
         return None
     
     else:
@@ -39,18 +39,28 @@ def lower(file):
     new_name = file.name.lower()
     new_path = file.parent / new_name
 
-    if new_path.exists :
+    if new_path.exists() :
         return None
     
     else:
         return new_path
     
 def title(file):
-    new_name = file.stem.title()
+    new_name = file.stem.title() + file.suffix
     new_path = file.parent / new_name
 
-    if new_path.exists :
+    if new_path.exists() :
         return None
     
     else:
+        return new_path
+    
+def rename_extension(file, new):
+    new_path = file.with_suffix(new)
+    
+
+    if new_path.exists():
+        return None
+    
+    else :
         return new_path

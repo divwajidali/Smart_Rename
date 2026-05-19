@@ -6,11 +6,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("path")
 parser.add_argument("--prefix")
 parser.add_argument("--suffix")
-parser.add_argument("--numbering")
-parser.add_argument("--replace", args=2)
-parser.add_argument("--upper")
-parser.add_argument("--lower")
-parser.add_argument("--title")
+parser.add_argument("--numbering", action="store_true")
+parser.add_argument("--replace", nargs=2)
+parser.add_argument("--upper", action="store_true")
+parser.add_argument("--lower", action="store_true")
+parser.add_argument("--title", action="store_true")
+parser.add_argument("--extension")
 parser.add_argument("--yes", action="store_true")
 
 args = parser.parse_args()
@@ -24,7 +25,7 @@ elif not path.is_dir() :
     print("This is not folder.")
 
 else :
-    files = path.iterdir()
+    files = sorted(path.iterdir())
     found = False
     if args.prefix :
         from renamer import prefix_rename
@@ -54,7 +55,6 @@ else :
              
     elif args.numbering :
         changes = []
-        files = sorted(files)
         for number, file in enumerate(files, start=1):
             if file.is_file():
                 found = True
@@ -115,13 +115,29 @@ else :
                 new = title(file)
                 if new is not None:
                     changes.append((old, new))
+
+    elif args.extension:
+        from renamer import rename_extension
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = rename_extension(file, args.extension)
+                if new is not None:
+                    changes.append((old, new))
                                    
 
     if not found:
         print("Files do not exist.") 
 
-    from preview import preview
-    preview(changes)
+    if changes :
+        from preview import preview
+        preview(changes)
+
+    else:
+        print("No changes to preview.")
+        
     if args.yes :
         for old, new in changes :
             
