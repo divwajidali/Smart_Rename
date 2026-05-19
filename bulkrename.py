@@ -8,6 +8,9 @@ parser.add_argument("--prefix")
 parser.add_argument("--suffix")
 parser.add_argument("--numbering")
 parser.add_argument("--replace", args=2)
+parser.add_argument("--upper")
+parser.add_argument("--lower")
+parser.add_argument("--title")
 parser.add_argument("--yes", action="store_true")
 
 args = parser.parse_args()
@@ -23,10 +26,8 @@ elif not path.is_dir() :
 else :
     files = path.iterdir()
     found = False
-    from renamer import prefix_rename
-    from renamer import suffix_rename
-    from renamer import find_replace
     if args.prefix :
+        from renamer import prefix_rename
         prefix = args.prefix
         changes = []
         for file in files :
@@ -39,7 +40,8 @@ else :
 
     
      
-    elif args.suffix : 
+    elif args.suffix :
+        from renamer import suffix_rename 
         suffix = args.suffix
         changes = []
         for file in files :
@@ -66,6 +68,7 @@ else :
 
 
     elif args.replace :
+        from renamer import find_replace
         find = args.replace[0]
         replace = args.replace[1]
         changes = []
@@ -79,6 +82,40 @@ else :
                     if new is not None:
                         changes.append((old, new))
 
+    elif args.upper:
+        from renamer import upper
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = upper(file)
+                if new is not None:
+                    changes.append((old, new))
+
+
+    elif args.lower:
+        from renamer import lower
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = lower(file)
+                if new is not None:
+                    changes.append((old, new))
+
+    elif args.title:
+        from renamer import title
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = title(file)
+                if new is not None:
+                    changes.append((old, new))
+                                   
 
     if not found:
         print("Files do not exist.") 

@@ -24,3 +24,33 @@ def find_replace(file, find, replace):
     
     else:
         return new_path
+    
+def upper(file):
+    new_name = file.name.upper()
+    new_path = file.parent / new_name
+
+    if new_path.exists :
+        return None
+    
+    else:
+        return new_path
+    
+def lower(file):
+    new_name = file.name.lower()
+    new_path = file.parent / new_name
+
+    if new_path.exists :
+        return None
+    
+    else:
+        return new_path
+    
+def title(file):
+    new_name = file.stem.title()
+    new_path = file.parent / new_name
+
+    if new_path.exists :
+        return None
+    
+    else:
+        return new_path
