@@ -15,3 +15,12 @@ def suffix_rename(file, suffix):
 
     else:
         return new_path   
+    
+def find_replace(file, find, replace):
+    new_name = file.name.replace(find, replace)
+    new_path = file.parent / new_name
+    if new_path.exists():
+        return None
+    
+    else:
+        return new_path

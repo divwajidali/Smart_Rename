@@ -7,6 +7,7 @@ parser.add_argument("path")
 parser.add_argument("--prefix")
 parser.add_argument("--suffix")
 parser.add_argument("--numbering")
+parser.add_argument("--replace", args=2)
 parser.add_argument("--yes", action="store_true")
 
 args = parser.parse_args()
@@ -23,6 +24,8 @@ else :
     files = path.iterdir()
     found = False
     from renamer import prefix_rename
+    from renamer import suffix_rename
+    from renamer import find_replace
     if args.prefix :
         prefix = args.prefix
         changes = []
@@ -34,11 +37,9 @@ else :
                 if new is not None :
                     changes.append((old , new))
 
-    if not found:
-        print("Files do not exist.") 
-        
-    from renamer import suffix_rename
-    if args.suffix :
+    
+     
+    elif args.suffix : 
         suffix = args.suffix
         changes = []
         for file in files :
@@ -49,11 +50,12 @@ else :
                 if new is not None :
                     changes.append((old , new))
              
-    if args.numbering :
+    elif args.numbering :
         changes = []
-        sorted(files)
+        files = sorted(files)
         for number, file in enumerate(files, start=1):
             if file.is_file():
+                found = True
                 old = file
                 padded_num = str(number).zfill(3)
                 new = padded_num + file.suffix
@@ -62,8 +64,25 @@ else :
                     continue
                 changes.append((old,new_path))
 
-           
-            
+
+    elif args.replace :
+        find = args.replace[0]
+        replace = args.replace[1]
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                if find in file.name:
+                    new = find_replace(file, find, replace)
+
+                    if new is not None:
+                        changes.append((old, new))
+
+
+    if not found:
+        print("Files do not exist.") 
+
     from preview import preview
     preview(changes)
     if args.yes :
