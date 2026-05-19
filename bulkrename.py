@@ -21,7 +21,7 @@ elif not path.is_dir() :
 else :
     files = path.iterdir()
     found = False
-    from renamer import rename_file
+    from renamer import prefix_rename
     if args.prefix :
         prefix = args.prefix
         changes = []
@@ -29,7 +29,19 @@ else :
             if file.is_file() :
                 found = True
                 old = file
-                new = rename_file(file,prefix)
+                new = prefix_rename(file,prefix)
+                if new is not None :
+                    changes.append((old , new))
+
+    from renamer import suffix_rename
+    if args.suffix :
+        suffix = args.suffix
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = suffix_rename(file,suffix)
                 if new is not None :
                     changes.append((old , new))
             
