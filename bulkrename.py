@@ -195,24 +195,36 @@ else :
 
                 original = Path(item["old"])
 
+
                 if current.exists():
 
-                    if original.exists():
-                         if original.exists() and current.name.lower() != original.name.lower():
+                    if current.name.lower() == original.name.lower():
 
-                            print(original.name, "already exists")
+                        temp = current.with_name("temp_" + current.name)
+
+                        current.rename(temp)
+
+                        temp.rename(original)
+
+                    elif original.exists():
+
+                        print(original.name, "already exists")
 
                     else:
 
-                        if current.name.lower() == original.name.lower():
+                        current.rename(original)
 
-                            temp = current.with_name("temp_" + current.name)
+                else:
 
-                            current.rename(temp)
+                    if current.name.lower() == original.name.lower():
 
-                            temp.rename(original)
+                        temp = current.with_name("temp_" + current.name)
 
-                        else:
+                        current.rename(temp)
+
+                        temp.rename(original)
+
+                    else:
 
                              current.rename(original)
             
