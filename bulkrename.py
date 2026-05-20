@@ -204,7 +204,17 @@ else :
 
                     else:
 
-                        current.rename(original)
+                        if current.name.lower() == original.name.lower():
+
+                            temp = current.with_name("temp_" + current.name)
+
+                            current.rename(temp)
+
+                            temp.rename(original)
+
+                        else:
+
+                             current.rename(original)
             
 
             with open(filename, "w") as f:
