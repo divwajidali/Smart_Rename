@@ -16,6 +16,7 @@ parser.add_argument("--extension")
 parser.add_argument("--type" , nargs=2)
 parser.add_argument("--yes", action="store_true")
 parser.add_argument("--recursive", action="store_true")
+parser.add_argument("--undo", action="store_true")
 
 args = parser.parse_args()
 
@@ -147,8 +148,8 @@ else :
 
             for old, new in changes:
                 info = {
-                    "old" : old,
-                    "new" : new
+                    "old" : str(old),
+                    "new" : str(new)
                 }
                 data.append(info)
 
@@ -183,4 +184,21 @@ else :
         print("Preview only. Use --yes to apply changes.")
 
     
+    def undo (filename):
+        found = False
+        try:
+            with open("undo.json", "r") as f:
+                history = json.load(f)
+                found = True
 
+        except:
+            print("History not found.")
+        
+        if found:
+            for item in history:
+
+                current = Path(item["new"])
+
+                original = Path(item["old"])
+
+                current.rename(original)
