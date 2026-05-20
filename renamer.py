@@ -64,3 +64,14 @@ def rename_extension(file, new):
     
     else :
         return new_path
+    
+def specific_type_rename(file,type, new):
+    if file.suffix == type :
+        new_path = file.with_suffix(new)
+    
+
+        if new_path.exists():
+            return None
+    
+        else :
+            return new_path

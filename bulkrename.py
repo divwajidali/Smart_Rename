@@ -12,6 +12,7 @@ parser.add_argument("--upper", action="store_true")
 parser.add_argument("--lower", action="store_true")
 parser.add_argument("--title", action="store_true")
 parser.add_argument("--extension")
+parser.add_argument("--type" , nargs=2)
 parser.add_argument("--yes", action="store_true")
 
 args = parser.parse_args()
@@ -116,16 +117,18 @@ else :
                 if new is not None:
                     changes.append((old, new))
 
-    elif args.extension:
-        from renamer import rename_extension
+    elif args.type:
+        from renamer import specific_type_rename
+        type = args.type[0]
+        new = args.type[1]
         changes = []
         for file in files :
             if file.is_file() :
                 found = True
                 old = file
-                new = rename_extension(file, args.extension)
+                new_name = specific_type_rename(file, type, new)
                 if new is not None:
-                    changes.append((old, new))
+                    changes.append((old, new_name))
                                    
 
     if not found:
