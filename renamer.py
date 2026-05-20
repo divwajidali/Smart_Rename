@@ -25,7 +25,7 @@ def find_replace(file, find, replace):
     else:
         return new_path
     
-def upper(file):
+def to_uppercase(file):
     new_name = file.name.upper()
     new_path = file.parent / new_name
 
@@ -35,7 +35,7 @@ def upper(file):
     else:
         return new_path
     
-def lower(file):
+def to_lowercase(file):
     new_name = file.name.lower()
     new_path = file.parent / new_name
 
@@ -45,7 +45,7 @@ def lower(file):
     else:
         return new_path
     
-def title(file):
+def to_titlecase(file):
     new_name = file.stem.title() + file.suffix
     new_path = file.parent / new_name
 

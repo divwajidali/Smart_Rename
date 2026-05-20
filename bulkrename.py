@@ -36,6 +36,7 @@ else :
     else:
         files = sorted(path.iterdir())
     found = False
+    changes = []
     if args.prefix :
         from renamer import prefix_rename
         prefix = args.prefix
@@ -92,51 +93,62 @@ else :
                         changes.append((old, new))
 
     elif args.upper:
-        from renamer import upper
+        from renamer import to_uppercase
         changes = []
         for file in files :
             if file.is_file() :
                 found = True
                 old = file
-                new = upper(file)
+                new = to_uppercase(file)
                 if new is not None:
                     changes.append((old, new))
 
 
     elif args.lower:
-        from renamer import lower
+        from renamer import to_lowercase
         changes = []
         for file in files :
             if file.is_file() :
                 found = True
                 old = file
-                new = lower(file)
+                new = to_lowercase(file)
                 if new is not None:
                     changes.append((old, new))
 
     elif args.title:
-        from renamer import title
+        from renamer import to_titlecase
         changes = []
         for file in files :
             if file.is_file() :
                 found = True
                 old = file
-                new = title(file)
+                new = to_titlecase(file)
                 if new is not None:
                     changes.append((old, new))
 
     elif args.type:
         from renamer import specific_type_rename
-        type = args.type[0]
+        file_type = args.type[0]
         new = args.type[1]
         changes = []
         for file in files :
             if file.is_file() :
                 found = True
                 old = file
-                new_name = specific_type_rename(file, type, new)
-                if new is not None:
+                new_name = specific_type_rename(file, file_type, new)
+                if new_name is not None:
                     changes.append((old, new_name))
+
+    elif args.extension:
+        from renamer import rename_extension
+        changes = []
+        for file in files :
+            if file.is_file() :
+                found = True
+                old = file
+                new = specific_type_rename(file, args.extension)
+                if new is not None:
+                    changes.append((old, new))
                                    
     def save_history(changes):
             try:
@@ -154,7 +166,7 @@ else :
                 data.append(info)
 
             with open("undo.json", "w") as f:
-                json.dump(info, f, indent=4)
+                json.dump(data, f, indent=4)
 
 
 
@@ -187,11 +199,11 @@ else :
     def undo (filename):
         found = False
         try:
-            with open("undo.json", "r") as f:
+            with open(filename, "r") as f:
                 history = json.load(f)
                 found = True
 
-        except:
+        except FileNotFoundError:
             print("History not found.")
         
         if found:
@@ -201,4 +213,18 @@ else :
 
                 original = Path(item["old"])
 
-                current.rename(original)
+                if current.exists():
+
+                    if original.exists():
+
+                        print(original.name, "already exists")
+
+                    else:
+
+                        current.rename(original)
+
+                
+
+
+    if args.undo:
+        undo("undo.json")
