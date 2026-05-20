@@ -1,5 +1,6 @@
 from pathlib import Path
 import argparse
+import json
 
 parser = argparse.ArgumentParser()
 
@@ -136,12 +137,36 @@ else :
                 if new is not None:
                     changes.append((old, new_name))
                                    
+    def save_history(changes):
+            try:
+                with open("undo.json", "r") as f:
+                    data = json.load(f)
+
+            except FileNotFoundError:
+                data = []
+
+            for old, new in changes:
+                info = {
+                    "old" : old,
+                    "new" : new
+                }
+                data.append(info)
+
+            with open("undo.json", "w") as f:
+                json.dump(info, f, indent=4)
+
+
 
     if not found:
         print("Files do not exist.") 
 
+    def preview(changes):
+        print("\nPREVIEW\n")
+        for old, new in changes:
+            print(old.name , "->" , new.name)
+
+    
     if changes :
-        from preview import preview
         preview(changes)
 
     else:
@@ -151,6 +176,7 @@ else :
         for old, new in changes :
             
             old.rename(new)
+        save_history(changes)
         print("Files renamed successfully.")
 
     else: 
