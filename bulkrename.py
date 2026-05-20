@@ -2,23 +2,39 @@ from pathlib import Path
 import argparse
 import json
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    description="Cross-platform bulk file renaming tool"
+)
 
-parser.add_argument("path")
-parser.add_argument("--prefix")
-parser.add_argument("--suffix")
-parser.add_argument("--numbering", action="store_true")
-parser.add_argument("--replace", nargs=2)
-parser.add_argument("--upper", action="store_true")
-parser.add_argument("--lower", action="store_true")
-parser.add_argument("--title", action="store_true")
-parser.add_argument("--extension")
-parser.add_argument("--type" , nargs=2)
-parser.add_argument("--yes", action="store_true")
-parser.add_argument("--recursive", action="store_true")
-parser.add_argument("--undo", action="store_true")
+parser.add_argument("path", help="Path to target folder")
+parser.add_argument("--prefix", help="Add prefix to filenames")
+parser.add_argument("--suffix", help="Add suffix to filenames")
+parser.add_argument("--numbering", action="store_true", help="Add sequential numbering to filenames")
+parser.add_argument("--replace", nargs=2, help="Find and replace text in filenames")
+parser.add_argument("--upper", action="store_true", help="Convert filenames to uppercase")
+parser.add_argument("--lower", action="store_true", help="Convert filenames to lowercase")
+parser.add_argument("--title", action="store_true", help="Convert filenames to titlecase")
+parser.add_argument("--extension", help="Change file extensions")
+parser.add_argument("--type" , nargs=2, help="Rename only specific file types")
+parser.add_argument("--yes", action="store_true", help="Apply changing without confirmation")
+parser.add_argument("--recursive", action="store_true", help="Rename files recursively in subfolders")
+parser.add_argument("--undo", action="store_true", help="Undo the previous rename operation")
 
 args = parser.parse_args()
+
+if not any([
+    args.prefix,
+    args.suffix,
+    args.numbering,
+    args.replace,
+    args.upper,
+    args.lower,
+    args.title,
+    args.extension,
+    args.type,
+    args.undo
+]):
+    print("Please provide a rename operation.")
 
 path = Path(args.path)
 
@@ -35,7 +51,7 @@ else :
 
     else:
         files = sorted(path.iterdir())
-    found = False
+
     changes = []
     if args.prefix :
         from renamer import prefix_rename
@@ -43,7 +59,7 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
+        
                 old = file
                 new = prefix_rename(file,prefix)
                 if new is not None :
@@ -57,7 +73,7 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
+            
                 old = file
                 new = suffix_rename(file,suffix)
                 if new is not None :
@@ -67,7 +83,7 @@ else :
         changes = []
         for number, file in enumerate(files, start=1):
             if file.is_file():
-                found = True
+                
                 old = file
                 padded_num = str(number).zfill(3)
                 new = padded_num + file.suffix
@@ -84,7 +100,6 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
                 old = file
                 if find in file.name:
                     new = find_replace(file, find, replace)
@@ -96,8 +111,7 @@ else :
         from renamer import to_uppercase
         changes = []
         for file in files :
-            if file.is_file() :
-                found = True
+            if file.is_file():
                 old = file
                 new = to_uppercase(file)
                 if new is not None:
@@ -109,7 +123,6 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
                 old = file
                 new = to_lowercase(file)
                 if new is not None:
@@ -120,7 +133,6 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
                 old = file
                 new = to_titlecase(file)
                 if new is not None:
@@ -133,7 +145,6 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
                 old = file
                 new_name = specific_type_rename(file, file_type, new)
                 if new_name is not None:
@@ -144,19 +155,13 @@ else :
         changes = []
         for file in files :
             if file.is_file() :
-                found = True
                 old = file
-                new = specific_type_rename(file, args.extension)
+                new = rename_extension(file, args.extension)
                 if new is not None:
                     changes.append((old, new))
                                    
     def save_history(changes):
-            try:
-                with open("undo.json", "r") as f:
-                    data = json.load(f)
-
-            except FileNotFoundError:
-                data = []
+            data = []
 
             for old, new in changes:
                 info = {
@@ -167,46 +172,23 @@ else :
 
             with open("undo.json", "w") as f:
                 json.dump(data, f, indent=4)
-
-
-
-    if not found:
-        print("Files do not exist.") 
+ 
 
     def preview(changes):
         print("\nPREVIEW\n")
         for old, new in changes:
             print(old.name , "->" , new.name)
 
-    
-    if changes :
-        preview(changes)
-
-    else:
-        print("No changes to preview.")
-        
-    if args.yes :
-        for old, new in changes :
-            
-            old.rename(new)
-        save_history(changes)
-        print("Files renamed successfully.")
-
-    else: 
-        print("Preview only. Use --yes to apply changes.")
-
-    
     def undo (filename):
-        found = False
+        history = []
         try:
             with open(filename, "r") as f:
                 history = json.load(f)
-                found = True
 
         except FileNotFoundError:
             print("History not found.")
         
-        if found:
+        if history:
             for item in history:
 
                 current = Path(item["new"])
@@ -216,15 +198,39 @@ else :
                 if current.exists():
 
                     if original.exists():
+                         if original.exists() and current.name.lower() != original.name.lower():
 
-                        print(original.name, "already exists")
+                            print(original.name, "already exists")
 
                     else:
 
                         current.rename(original)
+            
 
-                
-
+            with open(filename, "w") as f:
+                json.dump([], f)
+            print("Undo completed successfully.")
 
     if args.undo:
         undo("undo.json")
+
+    else:
+
+        if changes :
+            preview(changes)
+
+        else:
+            print("No changes to preview.")
+        
+        if args.yes :
+            for old, new in changes :
+            
+                old.rename(new)
+            save_history(changes)
+            print("Files renamed successfully.")
+
+        elif changes:
+            print("Preview only. Use --yes to apply changes.")
+
+    
+    
