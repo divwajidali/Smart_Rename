@@ -14,6 +14,7 @@ parser.add_argument("--title", action="store_true")
 parser.add_argument("--extension")
 parser.add_argument("--type" , nargs=2)
 parser.add_argument("--yes", action="store_true")
+parser.add_argument("--recursive", action="store_true")
 
 args = parser.parse_args()
 
@@ -25,8 +26,13 @@ if not path.exists() :
 elif not path.is_dir() :
     print("This is not folder.")
 
+
 else :
-    files = sorted(path.iterdir())
+    if args.recursive :
+        files = sorted(path.rglob("*"))
+
+    else:
+        files = sorted(path.iterdir())
     found = False
     if args.prefix :
         from renamer import prefix_rename
