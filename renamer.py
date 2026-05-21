@@ -1,5 +1,5 @@
 def prefix_rename(file,prefix):
-    new_name = prefix  + file.name
+    new_name = prefix  + " " + file.name
     new_path = file.parent / new_name
     if new_path.exists() :
         return None
@@ -8,7 +8,7 @@ def prefix_rename(file,prefix):
         return new_path
     
 def suffix_rename(file, suffix):
-    new_name = file.stem  + suffix + file.suffix
+    new_name = file.stem  + " " + suffix + file.suffix
     new_path = file.parent / new_name
     if new_path.exists() :
         return None
