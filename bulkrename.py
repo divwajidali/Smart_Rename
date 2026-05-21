@@ -35,6 +35,7 @@ if not any([
     args.undo
 ]):
     print("Please provide a rename operation.")
+    exit()
 
 path = Path(args.path)
 
@@ -184,58 +185,52 @@ else :
             print(f"{old.name :<55}{"|" :<10}{new.name :<65}")
         print("="* 130)
     def undo (filename):
-        history = []
         try:
             with open(filename, "r") as f:
                 history = json.load(f)
 
         except FileNotFoundError:
             print("History not found.")
+            return
         
-        if history:
-            for item in history:
+        if not history:
+            print("Nothing to undo.")
+            return
+        
+        undo_count = 0
+        
+        
+        for item in history:
 
-                current = Path(item["new"])
+            current = Path(item["new"])
 
-                original = Path(item["old"])
+            original = Path(item["old"])
 
 
-                if current.exists():
+            if not current.exists():
+                    continue
 
-                    if current.name.lower() == original.name.lower():
+            if current.name.lower() == original.name.lower():
 
-                        temp = current.with_name("temp_" + current.name)
+                temp = current.with_name("temp_" + current.name)
 
-                        current.rename(temp)
+                current.rename(temp)
 
-                        temp.rename(original)
+                temp.rename(original)
 
-                    elif original.exists():
+            elif original.exists():
 
-                        print(original.name, "already exists")
+                print(original.name, "already exists")
 
-                    else:
+            else:
 
-                        current.rename(original)
+                current.rename(original)
 
-                else:
+            undo_count += 1
 
-                    if current.name.lower() == original.name.lower():
-
-                        temp = current.with_name("temp_" + current.name)
-
-                        current.rename(temp)
-
-                        temp.rename(original)
-
-                    else:
-
-                             current.rename(original)
-            
-
-            with open(filename, "w") as f:
-                json.dump([], f)
-            print("Undo completed successfully.")
+        with open(filename, "w") as f:
+            json.dump([], f)
+        print(f"{undo_count} files restored successfully.")
 
     if args.undo:
         undo("undo.json")
