@@ -16,7 +16,7 @@ parser.add_argument("--lower", action="store_true", help="Convert filenames to l
 parser.add_argument("--title", action="store_true", help="Convert filenames to titlecase")
 parser.add_argument("--extension", help="Change file extensions")
 parser.add_argument("--type" , nargs=2, help="Rename only specific file types")
-parser.add_argument("--yes", action="store_true", help="Apply changing without confirmation")
+parser.add_argument("--yes", action="store_true", help="Apply changes without confirmation")
 parser.add_argument("--recursive", action="store_true", help="Rename files recursively in subfolders")
 parser.add_argument("--undo", action="store_true", help="Undo the previous rename operation")
 
