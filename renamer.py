@@ -69,7 +69,7 @@ def specific_type_rename(file,file_type, new):
     if not new.startswith("."):
     
         new = "." + new
-    if file.suffix == type :
+    if file.suffix == file_type :
         new_path = file_type.with_suffix(new)
     
 

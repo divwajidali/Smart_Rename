@@ -176,9 +176,13 @@ else :
 
     def preview(changes):
         print("\nPREVIEW\n")
+        print("="* 130)
+        print(f"{'old' :<55}{'new' :<65}")
+        print("="* 130)
         for old, new in changes:
-            print(old.name , "->" , new.name)
-
+            
+            print(f"{old.name :<55}{"|" :<10}{new.name :<65}")
+        print("="* 130)
     def undo (filename):
         history = []
         try:
