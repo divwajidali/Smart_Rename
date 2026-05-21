@@ -177,7 +177,7 @@ else :
     def preview(changes):
         print("\nPREVIEW\n")
         print("="* 130)
-        print(f"{'old' :<55}{'new' :<65}")
+        print(f"{'old' :<55}{"|" :<10}{'new' :<65}")
         print("="* 130)
         for old, new in changes:
             
